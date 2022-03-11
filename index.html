@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INFO 4311 HW3</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://d3js.org/topojson.v3.min.js"></script>
+    <style>
+        .legend span {
+            margin-right: 10px;
+        }
+        
+        .gridlines line {
+            stroke: #bbb;
+        }
+        
+        .gridlines .domain {
+            stroke: none;
+        }
+        
+        .neighborhood {
+            fill: #f0f0f0;
+            stroke: white;
+            stroke-width: 2px;
+        }
+        
+        div.tooltip {
+            position: relative;
+            text-align: center;
+            width: 150px;
+            height: 28px;
+            padding: 2px;
+            font: 12px sans-serif;
+            background: lightsteelblue;
+            border: 0px;
+            border-radius: 8px;
+            pointer-events: none;
+        }
+        
+        .country {
+            fill: white;
+        }
+        
+        g.mouseover rect {
+            fill: white;
+            stroke: #222;
+            stroke-width: 1px;
+        }
+        
+        .outline {
+            stroke: #bbb;
+            stroke-width: 1px;
+            fill: none;
+        }
+        
+        .graticule {
+            fill: none;
+            stroke: black;
+            stroke-width: 1px;
+        }
+        
+        .gridlines line {
+            stroke: #bbb;
+        }
+        
+        #container {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            /* font-family: 'Michroma'; */
+            font-family: -apple-system, system-ui, BlinkMacSystemFont;
+            font-size: 22px;
+            color: #484848;
+            margin-left: 150px;
+        }
+        
+        .gridlines .domain {
+            stroke: none;
+        }
+        
+        .footer {
+            margin: 0;
+            padding-top: 1em;
+            padding-bottom: 1em;
+            text-align: center;
+            background-color: #e0e0e0;
+            font-family: -apple-system, system-ui, BlinkMacSystemFont;
+        }
+        
+        .footer {
+            margin: 0;
+            padding-top: 1em;
+            padding-bottom: 1em;
+            text-align: center;
+            background-color: #e0e0e0;
+            font-family: -apple-system, system-ui, BlinkMacSystemFont;
+        }
+        
+        #mapDiv {
+            text-align: center;
+            float: center;
+            display: block;
+            align: center;
+            margin-top: 50px;
+            border-color: black;
+        }
+        
+        #container {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            font-family: -apple-system, system-ui, BlinkMacSystemFont;
+            font-size: 22px;
+            color: #484848;
+            margin-left: 150px;
+        }
+        
+        .container {
+            justify-content: center;
+        }
+        
+        #scatterplotdiv {
+            text-align: center;
+        }
+        
+        #secondbutton {
+            text-align: center;
+            float: right;
+            flex-direction: row;
+        }
+        
+        .label {
+            float: right;
+            font-family: -apple-system, system-ui, BlinkMacSystemFont;
+            font-size: 15px;
+        }
+        /*        #my_dataviz {
+            float: right;
+        }*/
+        
+        #title {
+            font-family: -apple-system, system-ui, BlinkMacSystemFont;
+            font-weight: 650;
+            text-align: center;
+            font-size: 40px;
+            color: #555;
+        }
+        
+        #buttonPanel {
+            font-family: -apple-system, system-ui, BlinkMacSystemFont;
+            font-weight: 650;
+            text-align: center;
+            font-size: 40px;
+        }
+        
+        #text {
+            position: relative;
+            margin-left: 16%;
+            margin-right: 16%;
+            /* font-family: 'Michroma'; */
+            font-family: -apple-system, system-ui, BlinkMacSystemFont;
+            font-size: 22px;
+            text-align: left;
+            color: #555;
+        }
+        
+        #descriptive-title {
+            font-family: -apple-system, system-ui, BlinkMacSystemFont;
+            font-weight: 650;
+            text-align: center;
+            font-size: 20px;
+            color: #555;
+        }
+        
+        #descriptive-text {
+            position: relative;
+            margin-left: 16%;
+            margin-right: 16%;
+            /* font-family: 'Michroma'; */
+            font-family: -apple-system, system-ui, BlinkMacSystemFont;
+            font-size: 18px;
+            text-align: center;
+            color: #555;
+        }
+        
+        #annotations {
+            float: right;
+            font-family: -apple-system, system-ui, BlinkMacSystemFont;
+            font-size: 15px;
+        }
+        
+        #button-bar {
+            text-align: center;
+            font-family: -apple-system, system-ui, BlinkMacSystemFont;
+            font-size: 15px;
+        }
+        
+        #scatterplot {
+            font-family: -apple-system, system-ui, BlinkMacSystemFont;
+        }
+        
+        tr {
+            font-family: -apple-system, system-ui, BlinkMacSystemFont;
+            max-width: 200px;
+            word-wrap: break-word;
+        }
+        
+        td {
+            font-family: -apple-system, system-ui, BlinkMacSystemFont;
+            max-width: 200px;
+            word-wrap: break-word;
+        }
+        
+        #infoTable {
+            font-family: -apple-system, system-ui, BlinkMacSystemFont;
+            text-align: left;
+        }
+        
+        #secondbutton {
+            font-family: -apple-system, system-ui, BlinkMacSystemFont;
+        }
+        
+        #legends {
+            position: relative;
+            margin-left: 16%;
+            margin-right: 16%;
+            /* font-family: 'Michroma'; */
+            font-family: -apple-system, system-ui, BlinkMacSystemFont;
+            font-size: 18px;
+            text-align: center;
+            color: #555;
+        }
+        
+        #countriesMap {
+            FONT-WEIGHT: 200;
+            background-color: #F5F5F5;
+            /* stroke: black; */
+            /* border: black; */
+            text-align: center;
+            float: center;
+            flex-direction: row;
+        }
+        
+        button {
+            width: 200px;
+            height: 30px;
+            padding: 3px;
+            margin: 20px;
+            background-color: transparent;
+            border-radius: 4px;
+            border: 1px solid #bbb;
+            cursor: pointer;
+            box-sizing: border-box;
+            font-family: -apple-system, system-ui, BlinkMacSystemFont;
+            /* padding-right: 10px;
+            margin-right: 10px; */
+        }
+        
+        .containerfix {
+            display: flex;
+            flex-flow: row wrap;
+            justify-content: center;
+            padding: 0;
+            margin: 0;
+            list-style: none;
+            gap: 15px;
+        }
+    </style>
+
+    <script type="text/javascript">
+        function closeAndRefresh() {
+            window.location.reload(true);
+        }
+    </script>
+</head>
+
+<body>
+    <!-- <span onclick="closeAndRefresh();">&#10006;</span> -->
+    <div style="background: #f5f5f7;">
+        <br>
+        <p id="title">Boston Yelp Restaurant Finder
+        </p>
+
+        <br>
+
+    </div>
+
+    <div id="scatterplotdiv">
+        <p id="descriptive-title">
+            Wanna find the best restaurants in Boston?
+        </p>
+        <p id="descriptive-text">
+            Take a look! </p>
+        <svg id="scatterplot" align='left ' height="800" width="900" style="margin-top:50px">
+            
+        </svg>
+        <table id="infoTable" align='right' style="margin-right:250px">
+            <tr>
+                <th id="name">Click on restaurant for details</th>
+            </tr>
+            <tr>
+                <td>Restaurant type:</td>
+                <td id="type">N/A</td>
+            </tr>
+            <tr>
+                <td>Food Category:</td>
+                <td id="food">N/A</td>
+            </tr>
+            <tr>
+                <td>neighborhood:</td>
+                <td id="neighborhood">N/A</td>
+            </tr>
+            <tr>
+                <td>Review:</td>
+                <td id="review">N/A</td>
+            </tr>
+            <tr>
+                <td>Rating:</td>
+                <td id="rating">N/A</td>
+            </tr>
+            <tr>
+                <td>Website:</td>
+                <td id="url">N/A</td>
+            </tr>
+            <tr>
+                <td>number of reviews:</td>
+                <td id="num">N/A</td>
+            </tr>
+            <tr></tr>
+        </table>
+        <text id='label' x='400' y='400' text-anchor='end' alighment-baseline='hanging'> </text>
+        <hr>
+
+        <p id="descriptive-title">
+            Find restaurant by food categories:
+        </p>
+        <div id="button-bar">
+            <button style="color:#000" onclick="showCategory('bakeries')">bakeries</button>
+            <button style="color:#000" onclick="showCategory('cafes')">cafes</button>
+            <button style="color:#000" onclick="showCategory('donuts')">donuts</button>
+            <button style="color:#000" onclick="showCategory('ethnicmarkets')">ethnicmarkets</button>
+            <button style="color:#000" onclick="showCategory('indpak')">Indian & Pakistan</button>
+            <button style="color:#000" onclick="showCategory('italian')">Italian & French</button>
+            <button style="color:#000" onclick="showCategory('mexican')">Mexican & American</button>
+            <button style="color:#000" onclick="showCategory('chinese')">Chinese</button>
+            <button style="color:#000" onclick="showCategory('japanese')">Japanese</button>
+            <button style="color:#000" onclick="showCategory('vietnamese')">Vietnamese</button>
+            <button onclick="showCategory('all')">Show All</button>
+        </div>
+
+
+        <hr>
+        <p id="descriptive-title">
+            Find restaurant by region:
+        </p>
+        <div id="button-bar">
+            <button style="color:#000004" onclick="showRegion('West Roxbury')">West Roxbury</button>
+            <button style="color:#060419" onclick="showRegion('Waterfront')">Waterfront</button>
+            <button style="color:#120a32" onclick="showRegion('Teele Square')">Teele Square</button>
+            <button style="color:#230c4c" onclick="showRegion('South End')">South End</button>
+            <button style="color:#360961" onclick="showRegion('South Boston')">South Boston</button>
+            <button style="color:#490b6a" onclick="showRegion('Porter Square')">Porter Square</button>
+            <button style="color:#5a116e" onclick="showRegion('North End')">North End</button>
+            <button style="color:#6c186e" onclick="showRegion('North Cambridge')">North Cambridge</button>
+            <button style="color:#7f1e6c" onclick="showRegion('Mission Hill')">Mission Hill</button>
+            <button style="color:#902568" onclick="showRegion('Kendall Square/MIT')">Kendall Square/MIT</button>
+            <button style="color:#a22b62" onclick="showRegion('Jamaica Plain')">Jamaica Plain</button>
+            <button style="color:#b3325a" onclick="showRegion('Inman Square')">Inman Square</button>
+            <button style="color:#c33b4f" onclick="showRegion('Harvard Square')">Harvard Square</button>
+            <button style="color:#d24644" onclick="showRegion('Financial District')">Financial District</button>
+            <button style="color:#df5337" onclick="showRegion('Fenway')">Fenway</button>
+            <button style="color:#ea632a" onclick="showRegion('East Boston')">East Boston</button>
+            <button style="color:#f3761b" onclick="showRegion('Downtown')">Downtown</button>
+            <button style="color:#f8890c" onclick="showRegion('Dorchester')">Dorchester</button>
+            <button style="color:#fb9d07" onclick="showRegion('Chinatown')">Chinatown</button>
+            <button style="color:#fcb216" onclick="showRegion('Coolidge Corner')">Coolidge Corner</button>
+            <button style="color:#f9c72f" onclick="showRegion('Charlestown')">Charlestown</button>
+            <button style="color:#f9c11f" onclick="showRegion('Beacon Hill')">Beacon Hill</button>
+            <button style="color:#f9c71f" onclick="showRegion('Back Bay')">Back Bay</button>
+            <button style="color:#f9c70f" onclick="showRegion('Allston/Brighton')">Allston/Brighton</button>
+            <button onclick="showRegion('all')">Show All</button>
+        </div>
+
+    </div>
+
+    <div style="background: #f5f5f7;">
+        <br>
+        <p id="descriptive-title">
+            Hint: if you clicked one restaurant, their location would stay on the map.
+        </p>
+        <p id="descriptive-text">
+            Double click that restaurant to highlight it and put it in your bookmarks! </p>
+        <br>
+
+
+    </div>
+
+
+
+
+    <div class="footer">
+        <p id="main-subtitle">
+            <b>INFO 5311 HW3</b>
+            <br>
+            <p></p>Marcus Fang
+
+
+        </p>
+        <p style="text-align: center; font-size: 80%; color: #7c7c7f;">
+            Data Source: Boston Yelp .csv file and
+            <a href="https://gist.github.com/jdev42092/5c285c4a3608eb9f9864f5da27db4e49" target="_blank">boston_neighborhoods.json
+          </a>
+        </p>
+    </div>
+    <script>
+        console.log("Hello World!")
+
+        const svg = d3.select("#scatterplot");
+        //const legend1 = d3.select("svg#legends");
+        const width = svg.attr("width");
+        const height = svg.attr("height");
+        globalFactor = "Family"
+        const margin = {
+            top: 10,
+            right: 10,
+            bottom: 50,
+            left: 60
+        };
+        let tooltipWidth = 200;
+        let tooltipHeight = 60;
+        const chartWidth = width - margin.left - margin.right;
+        const chartHeight = height - margin.top - margin.bottom;
+        let annotations = svg.append("g").attr("id", "annotations");
+        // const chartArea = mainplot.append("g").attr("id", "points")
+        //     .attr("transform", `translate(${margin.left},${margin.top})`);
+
+        const chartArea = svg.append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        let viewport = chartArea.append("g");
+
+        // tooltip
+        var div = d3.select("#scatterplotdiv").append("div")
+            .attr("class", "tooltip")
+            .style("opacity", 0);
+
+        // const map = svg.append("g")
+        //     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        // mouseover 
+        const mouseover = svg.append("g").attr("class", "mouseover")
+            .attr("transform", `translate(${margin.left + 15},${margin.top + 15})`);
+
+        function lenlimit(str) {
+            const dummytxt = mouseover.append("text").attr("class", "legendtext").attr("visibility", "hidden");
+            dummytxt.text(str)
+            let length = dummytxt.node().getComputedTextLength()
+            dummytxt.remove()
+            return length;
+        }
+
+        const frame = mouseover.append("rect").attr("class", "frame")
+            .attr("x", 630).attr("y", 365)
+            .attr("rx", 3).attr("ry", 3)
+            //.attr("width", 210)
+            .attr("height", 120);
+
+        const textbox = mouseover.append("g").attr("transform", "translate(10,10)");
+
+        function updateMouseover(d) {
+            textbox.html('');
+
+            let countryname = `Country: ${d["Country"]}`;
+            let gdpval = `GDP: ${d["GDP"]}`;
+            let happinessval = `Happiness: ${d["Happiness Score"]}`;
+            let regionval = `Region: ${d["Region"]}`;
+            let trustval = `Government Corruption: ${d["Trust"]}`;
+
+            let maxWidth = Math.max(lenlimit(regionval), lenlimit(happinessval))
+            frame.attr("width", maxWidth + 100);
+
+
+        }
+
+        // data analysis
+        let colorScale;
+        var happiness;
+
+        const bosNeighborhoods = d3.json('https://gist.githubusercontent.com/jdev42092/5c285c4a3608eb9f9864f5da27db4e49/raw/a1c33b1432ca2948f14f656cc14c7c7335f78d95/boston_neighborhoods.json')
+        console.log(bosNeighborhoods);
+        const requestData = async function() {
+
+            const bos = await d3.json("../boston_neighborhoods.json");
+            const bos2 = await d3.json("../Boston_Neighborhoods.geojson");
+
+            console.log(bos);
+            console.log('features');
+
+            var projection = d3.geoMercator().fitSize([width, height], bos);
+            console.log(path);
+
+
+            var path = d3.geoPath().projection(projection);
+
+
+            bosProjection = d3.geoAlbers()
+                .scale(190000)
+                .rotate([71.057, 0])
+                .center([0, 42.313])
+                .translate([width / 2, height / 2]);
+
+
+            bos_geoPath = d3.geoPath()
+                .projection(bosProjection);
+
+            viewport.selectAll("path").data(bos.features)
+                .join("path")
+                .attr("class", "neighborhood")
+                .attr("d", path);
+
+
+
+            const restaurant = await d3.csv("yelp_boston.csv", d3.autoType);
+            console.log("fds");
+
+            const colorsRegion = restaurant.map(d => d["search category"]);
+            divergentScale = ["#fde725", "#b5de2b", "#6ece58", "#35b779", "#1f9e89", "#26828e", "#31688e", "#3e4989", "#482878", "#440154"]
+
+            var colorScale = d3.scaleOrdinal()
+                .domain(colorsRegion)
+                .range(divergentScale);
+
+            restaurant.forEach(d => {
+                d.Position = projection([d.longitude, d.latitude]);
+            });
+
+
+            let circles = viewport.selectAll("circle").data(restaurant)
+                .join("circle")
+                .attr("r", 2)
+                .attr("fill", d => colorScale(d['search category']))
+                .attr("opacity", 0.5)
+                .attr("cx", d => d.Position[0])
+                .attr("cy", d => d.Position[1])
+                .attr("class", function(d) {
+                    if (d['search category'] === "bakeries") {
+                        return "bakeries";
+                    } else if (d['search category'] == 'cafes') {
+                        return "cafes";
+                    } else if (d["search category"] == 'donuts') {
+                        return "donuts";
+                    } else if (d["search category"] == 'ethnicmarkets') {
+                        return "ethnicmarkets";
+                    } else if (d["search category"] == 'indpak') {
+                        return "indpak";
+                    } else if (d["search category"] == 'italian') {
+                        return "italian";
+                    } else if (d["search category"] == 'mexican') {
+                        return "mexican";
+                    } else if (d["search category"] == 'chinese') {
+                        return "chinese";
+                    } else if (d["search category"] == 'japanese') {
+                        return "japanese";
+                    } else if (d["search category"] == 'vietnamese') {
+                        return "vietnamese";
+                    } else {
+                        return "all";
+                    }
+                })
+                .attr("title", function(d) {
+                    if (d['neighborhood'] === "West Roxbury") {
+                        return "WestRoxbury";
+                    } else if (d['neighborhood'] == 'Waterfront') {
+                        return "Waterfront";
+                    } else if (d["neighborhood"] == 'Teele Square') {
+                        return "TeeleSquare";
+                    } else if (d["neighborhood"] == 'South End') {
+                        return "SouthEnd";
+                    } else if (d["neighborhood"] == 'South Boston') {
+                        return "SouthBoston";
+                    } else if (d["neighborhood"] == 'Porter Square') {
+                        return "PorterSquare";
+                    } else if (d["neighborhood"] == 'North End') {
+                        return "NorthEnd";
+                    } else if (d["neighborhood"] == 'North Cambridge') {
+                        return "NorthCambridge";
+                    } else if (d["neighborhood"] == 'Mission Hill') {
+                        return "MissionHill";
+                    } else if (d["neighborhood"] == 'Kendall Square/MIT') {
+                        return "KendallSquare/MIT";
+                    } else if (d["neighborhood"] == 'Jamaica Plain') {
+                        return "JamaicaPlain";
+                    } else if (d["neighborhood"] == 'Inman Square') {
+                        return "InmanSquare";
+                    } else if (d["neighborhood"] == 'Harvard Square') {
+                        return "HarvardSquare";
+                    } else if (d["neighborhood"] == 'Financial District') {
+                        return "FinancialDistrict";
+                    } else if (d["neighborhood"] == 'Fenway') {
+                        return "Fenway";
+                    } else if (d["neighborhood"] == 'East Boston') {
+                        return "EastBoston";
+                    } else if (d["neighborhood"] == 'Downtown') {
+                        return "Downtown";
+                    } else if (d["neighborhood"] == 'Dorchester') {
+                        return "Dorchester";
+                    } else if (d["neighborhood"] == 'Chinatown') {
+                        return "Chinatown";
+                    } else if (d["neighborhood"] == 'Coolidge Corner') {
+                        return "CoolidgeCorner";
+                    } else if (d["neighborhood"] == 'Charlestown') {
+                        return "Charlestown";
+                    } else if (d["neighborhood"] == 'Beacon Hill') {
+                        return "BeaconHill";
+                    } else if (d["neighborhood"] == 'Back Bay') {
+                        return "BackBay";
+                    } else if (d["neighborhood"] == 'Allston/Brighton') {
+                        return "Allston/Brighton";
+                    } else {
+                        return "all";
+                    }
+                });
+
+            //pan-zoom handler,   
+            var zoom = d3.zoom()
+                .scaleExtent([1, 20])
+                .on("zoom", mapZoomed);
+            chartArea.call(zoom);
+            chartArea.call(zoom.transform, d3.zoomIdentity);
+
+            function mapZoomed({
+                transform
+            }) {
+
+                // Transform the group object to reflect the zoom action
+                viewport.attr("transform", transform.toString());
+
+                // Divide by scale to make sure strokes remain a consistent width during zooming
+                viewport.select(".state-outline")
+                    .style("stroke-width", 2 / transform.k);
+
+
+            }
+            //
+
+            /////////// newly added mouseover event//////////
+            circles.on("mouseover", function(d) {
+                //console.log(dataset);
+                mouseover.attr("visibility", "");
+                d3.select(this)
+                    .transition().duration(200)
+                    .attr("stroke", "black")
+                    .attr("stroke-width", 4)
+                    //.attr("fill", lighten(colorScale(d => d['Country'])));
+
+                //updateMouseover(d3.select(this).datum());
+                //updatePanel(d);
+
+
+            });
+
+            circles.on("mouseout", function() {
+                mouseover.attr("visibility", "hidden");
+                d3.select(this)
+                    .transition().duration(200)
+                    .attr("stroke-width", 0)
+                    //.attr("fill", colorScale(d => d['Country']));
+                    // updatePanel({});
+
+            });
+
+            circles.on("click", function() {
+                let data = d3.select(this).datum();
+                console.log(data);
+                d3.select(this)
+                    .transition().duration(200)
+                    .attr("stroke", "#FF3D00")
+                    .attr("stroke-width", "5px")
+
+                let name = d3.select("th#name");
+                let type = d3.select("td#type");
+                let food = d3.select("td#food");
+                let neighborhood = d3.select("td#neighborhood");
+                let review = d3.select("td#review");
+                let rating = d3.select("td#rating");
+                let url = d3.select("td#url");
+                let num = d3.select("td#num");
+
+                name.text(data["name"]);
+                type.text(data["search category"]);
+                food.text(data["categories"]);
+                neighborhood.text(data["neighborhood"]);
+                review.text(data["snippet_text"]);
+                rating.text(data["rating"]);
+                url.text(data["url"]);
+                num.text(data["review_count"]);
+
+            });
+
+        }
+        requestData();
+
+        function showCategory(place) {
+            if (place === "bakeries") {
+                console.log("westerneu");
+                d3.selectAll("circle").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "hidden");
+                })
+                d3.selectAll("circle.bakeries").each(function() {
+                    console.log("fu");
+                    d3.select(this).transition().duration(900).style("visibility", "visible");
+                })
+            }
+            if (place === "cafes") {
+                d3.selectAll("circle").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "hidden");
+                })
+                d3.selectAll("circle.cafes").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "visible");
+                })
+            }
+            if (place === "donuts") {
+                d3.selectAll("donuts").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "hidden");
+                })
+                d3.selectAll("circle.donuts").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "visible");
+                })
+            }
+            if (place === "ethnicmarkets") {
+                d3.selectAll("circle").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "hidden");
+                })
+                d3.selectAll("circle.ethnicmarkets").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "visible");
+                })
+            }
+            if (place === "indpak") {
+                d3.selectAll("circle").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "hidden");
+                })
+                d3.selectAll("circle.indpak").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "visible");
+                })
+            }
+            if (place === "italian") {
+                d3.selectAll("circle").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "hidden");
+                })
+                d3.selectAll("circle.italian").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "visible");
+                })
+            }
+            if (place === "mexican") {
+                d3.selectAll("circle").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "hidden");
+                })
+                d3.selectAll("circle.mexican").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "visible");
+                })
+            }
+            if (place === "chinese") {
+                d3.selectAll("circle").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "hidden");
+                })
+                d3.selectAll("circle.chinese").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "visible");
+                })
+            }
+            if (place === "japanese") {
+                d3.selectAll("circle").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "hidden");
+                })
+                d3.selectAll("circle.japanese").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "visible");
+                })
+            }
+            if (place === "vietnamese") {
+                d3.selectAll("circle").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "hidden");
+                })
+                d3.selectAll("circle.vietnamese").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "visible");
+                })
+            }
+            if (place === "all") {
+                d3.selectAll("circle").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "hidden");
+                })
+                d3.selectAll("circle").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "visible");
+                })
+            }
+        }
+
+        function showRegion(place) {
+            console.log("CLICKED");
+            if (place === "West Roxbury") {
+                d3.selectAll("circle").each(function() {
+                    console.log("1");
+                    d3.select(this).transition().duration(900).style("visibility", "hidden");
+                })
+                d3.selectAll("circle.WestRoxbury").each(function() {
+                    console.log("2");
+
+                    d3.select(this.title).transition().duration(900).style("visibility", "visible");
+                })
+            }
+            if (place === "Waterfront") {
+                d3.selectAll("circle").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "hidden");
+                })
+                d3.selectAll("circle.Waterfront").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "visible");
+                })
+            }
+            if (place === "Teele Square") {
+                d3.selectAll("circle").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "hidden");
+                })
+                d3.selectAll("circle.TeeleSquare").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "visible");
+                })
+            }
+            if (place === "SouthEnd") {
+                d3.selectAll("circle").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "hidden");
+                })
+                d3.selectAll("circle.SouthEnd").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "visible");
+                })
+            }
+            if (place === "SouthBoston") {
+                d3.selectAll("circle").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "hidden");
+                })
+                d3.selectAll("circle.SouthBoston").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "visible");
+                })
+            }
+            if (place === "PorterSquare") {
+                d3.selectAll("circle").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "hidden");
+                })
+                d3.selectAll("circle.PorterSquare").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "visible");
+                })
+            }
+            if (place === "NorthEnd") {
+                d3.selectAll("circle").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "hidden");
+                })
+                d3.selectAll("circle.NorthEnd").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "visible");
+                })
+            }
+            if (place === "NorthCambridge") {
+                d3.selectAll("circle").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "hidden");
+                })
+                d3.selectAll("circle.NorthCambridge").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "visible");
+                })
+            }
+            if (place === "MissionHill") {
+                d3.selectAll("circle").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "hidden");
+                })
+                d3.selectAll("circle.MissionHill").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "visible");
+                })
+            }
+            if (place === "KendallSquare/MIT") {
+                d3.selectAll("circle").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "hidden");
+                })
+                d3.selectAll("circle.KendallSquare/MIT").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "visible");
+                })
+            }
+            if (place === "JamaicaPlain") {
+                d3.selectAll("circle").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "hidden");
+                })
+                d3.selectAll("circle.JamaicaPlain").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "visible");
+                })
+            }
+            if (place === "InmanSquare") {
+                d3.selectAll("circle").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "hidden");
+                })
+                d3.selectAll("circle.InmanSquare").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "visible");
+                })
+            }
+            if (place === "HarvardSquare") {
+                d3.selectAll("circle").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "hidden");
+                })
+                d3.selectAll("circle.HarvardSquare").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "visible");
+                })
+            }
+            if (place === "FinancialDistrict") {
+                d3.selectAll("circle").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "hidden");
+                })
+                d3.selectAll("circle.FinancialDistrict").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "visible");
+                })
+            }
+            if (place === "Fenway") {
+                d3.selectAll("circle").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "hidden");
+                })
+                d3.selectAll("circle.Fenway").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "visible");
+                })
+            }
+            if (place === "EastBoston") {
+                d3.selectAll("circle").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "hidden");
+                })
+                d3.selectAll("circle.EastBoston").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "visible");
+                })
+            }
+            if (place === "Downtown") {
+                d3.selectAll("circle").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "hidden");
+                })
+                d3.selectAll("circle.Downtown").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "visible");
+                })
+            }
+            if (place === "Dorchester") {
+                d3.selectAll("circle").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "hidden");
+                })
+                d3.selectAll("circle.Dorchester").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "visible");
+                })
+            }
+            if (place === "Chinatown") {
+                d3.selectAll("circle").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "hidden");
+                })
+                d3.selectAll("circle.Chinatown").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "visible");
+                })
+            }
+            if (place === "CoolidgeCorner") {
+                d3.selectAll("circle").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "hidden");
+                })
+                d3.selectAll("circle.CoolidgeCorner").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "visible");
+                })
+            }
+            if (place === "Charlestown") {
+                d3.selectAll("circle").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "hidden");
+                })
+                d3.selectAll("circle.Charlestown").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "visible");
+                })
+            }
+            if (place === "BeaconHill") {
+                d3.selectAll("circle").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "hidden");
+                })
+                d3.selectAll("circle.BeaconHill").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "visible");
+                })
+            }
+            if (place === "BackBay") {
+                d3.selectAll("circle").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "hidden");
+                })
+                d3.selectAll("circle.BackBay").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "visible");
+                })
+            }
+            if (place === "Allston/Brighton") {
+                d3.selectAll("circle").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "hidden");
+                })
+                d3.selectAll("circle.Allston/Brighton").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "visible");
+                })
+            }
+            if (place === "all") {
+                d3.selectAll("circle").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "hidden");
+                })
+                d3.selectAll("circle").each(function() {
+                    d3.select(this).transition().duration(900).style("visibility", "visible");
+                })
+            }
+        }
+    </script>
+
+</body>
+
+</html>
